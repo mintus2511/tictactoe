@@ -29,7 +29,7 @@ class PowerUp {
 	}
 }
 
-public class TicTacToe implements ActionListener{
+public class TicTacToe implements ActionListener {
 	boolean gameOver = false;
 	Random random = new Random();
 	JFrame frame = new JFrame();
@@ -40,37 +40,37 @@ public class TicTacToe implements ActionListener{
 	boolean player1_turn;
 	Stack<GameState> undoStack = new Stack<>();
 	Stack<GameState> redoStack = new Stack<>();
-    JButton undoButton = new JButton("Undo");
-    JButton redoButton = new JButton("Redo");
+	JButton undoButton = new JButton("Undo");
+	JButton redoButton = new JButton("Redo");
 	JButton restartButton = new JButton("Restart");
 	private PowerUpType activePowerUp = null;
 	private JButton powerUpButton = new JButton("Use Power-Up");
 	private PowerUp currentPowerUp = null;
 	private boolean powerUpOwnedByPlayer1 = false;
 	private LinkedList<Integer> moveOrder = new LinkedList<>(); // lưu chỉ số nút theo thứ tự đã đánh
-	private boolean extraTurnQueued = false;  // chờ lượt tiếp theo
-	private boolean skipNextTurnSwitch = false;  // dùng sau khi nhấn EXTRA_TURN
-	
-	TicTacToe(){
+	private boolean extraTurnQueued = false; // chờ lượt tiếp theo
+	private boolean skipNextTurnSwitch = false; // dùng sau khi nhấn EXTRA_TURN
+
+	TicTacToe() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800,800);
-		frame.getContentPane().setBackground(new Color(50,50,50));
+		frame.setSize(800, 800);
+		frame.getContentPane().setBackground(new Color(50, 50, 50));
 		frame.setLayout(new BorderLayout());
 		frame.setVisible(true);
-		
-		textfield.setBackground(new Color(25,25,25));
-		textfield.setForeground(new Color(25,255,0));
-		textfield.setFont(new Font("Ink Free",Font.BOLD,75));
+
+		textfield.setBackground(new Color(25, 25, 25));
+		textfield.setForeground(new Color(25, 255, 0));
+		textfield.setFont(new Font("Ink Free", Font.BOLD, 75));
 		textfield.setHorizontalAlignment(JLabel.CENTER);
 		textfield.setText("Tic-Tac-Toe");
 		textfield.setOpaque(true);
-		
+
 		title_panel.setLayout(new BorderLayout());
-		title_panel.setBounds(0,0,800,100);
-		
-		button_panel.setLayout(new GridLayout(3,3));
-		button_panel.setBackground(new Color(150,150,150));
-		
+		title_panel.setBounds(0, 0, 800, 100);
+
+		button_panel.setLayout(new GridLayout(3, 3));
+		button_panel.setBackground(new Color(150, 150, 150));
+
 		for (int i = 0; i < 9; i++) {
 			buttons[i] = new JButton();
 			button_panel.add(buttons[i]);
@@ -80,9 +80,9 @@ public class TicTacToe implements ActionListener{
 			buttons[i].setBackground(new Color(214, 232, 255)); // Set to match your light blue style
 		}
 		generateRandomPowerUp();
-		
+
 		title_panel.add(textfield);
-		frame.add(title_panel,BorderLayout.NORTH);
+		frame.add(title_panel, BorderLayout.NORTH);
 		frame.add(button_panel);
 		JPanel control_panel = new JPanel();
 		control_panel.setLayout(new GridLayout(1, 4));
@@ -98,46 +98,48 @@ public class TicTacToe implements ActionListener{
 		powerUpButton.addActionListener(this);
 		powerUpButton.setEnabled(true);
 		restartButton.addActionListener(this);
-		
+
 		firstTurn();
 
-		
 	}
+
 	private static class CellState {
 		String text;
 		Color foreground;
 		Color background;
-	
+
 		CellState(String text, Color foreground, Color background) {
 			this.text = text;
 			this.foreground = foreground;
 			this.background = background;
 		}
-	}		
+	}
 
 	private static class GameState {
 		CellState[] board;
 		LinkedList<Integer> moveOrder;
 		boolean player1Turn;
-	
+
 		GameState(CellState[] board, LinkedList<Integer> moveOrder, boolean player1Turn) {
 			this.board = board;
 			this.moveOrder = new LinkedList<>(moveOrder); // deep copy để tránh mất dữ liệu
 			this.player1Turn = player1Turn;
 		}
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == undoButton && !undoStack.isEmpty()) {
-			if (!gameOver) redoStack.push(getGameState());
+			if (!gameOver)
+				redoStack.push(getGameState());
 			setGameState(undoStack.pop());
 			gameOver = false;
 			return;
 		}
 
 		if (e.getSource() == redoButton && !redoStack.isEmpty()) {
-			if (!gameOver) undoStack.push(getGameState());
+			if (!gameOver)
+				undoStack.push(getGameState());
 			setGameState(redoStack.pop());
 			gameOver = false;
 			return;
@@ -148,12 +150,15 @@ public class TicTacToe implements ActionListener{
 			return;
 		}
 
-		if (gameOver && moveOrder.size() < 9) return;
+		if (gameOver && moveOrder.size() < 9)
+			return;
 
-		if (e.getSource() == powerUpButton && gameOver) return;
+		if (e.getSource() == powerUpButton && gameOver)
+			return;
 
 		if (e.getSource() == powerUpButton && activePowerUp != null) {
-			if (player1_turn != powerUpOwnedByPlayer1) return;
+			if (player1_turn != powerUpOwnedByPlayer1)
+				return;
 
 			if (activePowerUp == PowerUpType.EXTRA_TURN && extraTurnQueued) {
 				textfield.setText("EXTRA TURN activated! " + (player1_turn ? "X" : "O") + " plays again!");
@@ -166,7 +171,7 @@ public class TicTacToe implements ActionListener{
 			} else if (activePowerUp == PowerUpType.REMOVE_OPPONENT_MARK) {
 				for (int i = 0; i < 9; i++) {
 					if (!buttons[i].getText().equals("") &&
-						!buttons[i].getText().equals(player1_turn ? "X" : "O")) {
+							!buttons[i].getText().equals(player1_turn ? "X" : "O")) {
 						buttons[i].setText("");
 						buttons[i].setForeground(Color.BLACK);
 						buttons[i].setBackground(new Color(214, 232, 255));
@@ -175,7 +180,7 @@ public class TicTacToe implements ActionListener{
 
 						// If power-up being removed was also currentPowerUp, reset it
 						if (currentPowerUp != null &&
-							currentPowerUp.position.equals(new java.awt.Point(i % 3, i / 3))) {
+								currentPowerUp.position.equals(new java.awt.Point(i % 3, i / 3))) {
 							currentPowerUp = null;
 						}
 
@@ -191,7 +196,8 @@ public class TicTacToe implements ActionListener{
 
 		for (int i = 0; i < 9; i++) {
 			if (e.getSource() == buttons[i]) {
-				if (gameOver) return;
+				if (gameOver)
+					return;
 
 				// Nếu còn Power-Up chưa dùng → không được đánh tiếp
 				if (activePowerUp != null && player1_turn == powerUpOwnedByPlayer1) {
@@ -223,9 +229,9 @@ public class TicTacToe implements ActionListener{
 
 						moveOrder.remove((Integer) indexToRemove);
 
-
 						if (currentPowerUp != null &&
-							currentPowerUp.position.equals(new java.awt.Point(indexToRemove % 3, indexToRemove / 3))) {
+								currentPowerUp.position
+										.equals(new java.awt.Point(indexToRemove % 3, indexToRemove / 3))) {
 							currentPowerUp = null;
 							activePowerUp = null;
 							powerUpButton.setText("Use Power-Up");
@@ -237,31 +243,29 @@ public class TicTacToe implements ActionListener{
 						buttons[indexToRemove].setBackground(new Color(214, 232, 255));
 						buttons[indexToRemove].setToolTipText(null);
 					} else {
-						return;  // Cell is taken and board not full → disallow move
+						return; // Cell is taken and board not full → disallow move
 					}
 				}
 
-		
 				// Nếu bàn đầy, cần xóa ô cũ NHƯNG làm việc này TRƯỚC khi lưu Undo
 				if (moveOrder.size() >= 9) {
 					int indexToRemove = -1;
 
-				// Prefer removing opponent's mark first
-				String currentSymbol = player1_turn ? "X" : "O";
-				String opponentSymbol = player1_turn ? "O" : "X";
+					// Prefer removing opponent's mark first
+					String currentSymbol = player1_turn ? "X" : "O";
+					String opponentSymbol = player1_turn ? "O" : "X";
 
-				for (int index : moveOrder) {
-					if (buttons[index].getText().equals(opponentSymbol)) {
-						indexToRemove = index;
-						break;
+					for (int index : moveOrder) {
+						if (buttons[index].getText().equals(opponentSymbol)) {
+							indexToRemove = index;
+							break;
+						}
 					}
 				}
-			}
 
 				// Bây giờ mới lưu trạng thái
 				undoStack.push(getGameState());
 				redoStack.clear();
-
 
 				// Đánh dấu nước đi mới
 				boolean currentPlayer = player1_turn;
@@ -269,11 +273,9 @@ public class TicTacToe implements ActionListener{
 				buttons[i].setForeground(currentPlayer ? new Color(255, 0, 0) : new Color(0, 0, 255));
 				moveOrder.add(i);
 
-												
-
 				// Power-up trùng ô vừa đánh
 				if (currentPowerUp != null &&
-					currentPowerUp.position.equals(new java.awt.Point(i % 3, i / 3))) {
+						currentPowerUp.position.equals(new java.awt.Point(i % 3, i / 3))) {
 					buttons[i].setBackground(new Color(255, 255, 153));
 					activePowerUp = currentPowerUp.type;
 					if (activePowerUp == PowerUpType.EXTRA_TURN) {
@@ -293,13 +295,12 @@ public class TicTacToe implements ActionListener{
 								textfield.setText((player1_turn ? "X" : "O") + " turn");
 						}
 					}).start();
-					
-					
+
 					currentPowerUp = null;
 				}
 
 				check();
-				
+
 				// Đổi lượt (trừ khi dùng EXTRA_TURN)
 				if (skipNextTurnSwitch) {
 					skipNextTurnSwitch = false;
@@ -319,141 +320,106 @@ public class TicTacToe implements ActionListener{
 		}
 	}
 
-
-	
 	public void firstTurn() {
-		
+
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		if(random.nextInt(2)==0) {
-			player1_turn=true;
+
+		if (random.nextInt(2) == 0) {
+			player1_turn = true;
 			textfield.setText("X turn");
-		}
-		else {
-			player1_turn=false;
+		} else {
+			player1_turn = false;
 			textfield.setText("O turn");
 		}
 	}
-	
+
 	public void check() {
-		//check X win conditions
-		if(
-				(buttons[0].getText().equals("X")) &&
+		// check X win conditions
+		if ((buttons[0].getText().equals("X")) &&
 				(buttons[1].getText().equals("X")) &&
-				(buttons[2].getText().equals("X"))
-				) {
-			xWins(0,1,2);
+				(buttons[2].getText().equals("X"))) {
+			xWins(0, 1, 2);
 		}
-		if(
-				(buttons[3].getText().equals("X")) &&
+		if ((buttons[3].getText().equals("X")) &&
 				(buttons[4].getText().equals("X")) &&
-				(buttons[5].getText().equals("X"))
-				) {
-			xWins(3,4,5);
+				(buttons[5].getText().equals("X"))) {
+			xWins(3, 4, 5);
 		}
-		if(
-				(buttons[6].getText().equals("X")) &&
+		if ((buttons[6].getText().equals("X")) &&
 				(buttons[7].getText().equals("X")) &&
-				(buttons[8].getText().equals("X"))
-				) {
-			xWins(6,7,8);
+				(buttons[8].getText().equals("X"))) {
+			xWins(6, 7, 8);
 		}
-		if(
-				(buttons[0].getText().equals("X")) &&
+		if ((buttons[0].getText().equals("X")) &&
 				(buttons[3].getText().equals("X")) &&
-				(buttons[6].getText().equals("X"))
-				) {
-			xWins(0,3,6);
+				(buttons[6].getText().equals("X"))) {
+			xWins(0, 3, 6);
 		}
-		if(
-				(buttons[1].getText().equals("X")) &&
+		if ((buttons[1].getText().equals("X")) &&
 				(buttons[4].getText().equals("X")) &&
-				(buttons[7].getText().equals("X"))
-				) {
-			xWins(1,4,7);
+				(buttons[7].getText().equals("X"))) {
+			xWins(1, 4, 7);
 		}
-		if(
-				(buttons[2].getText().equals("X")) &&
+		if ((buttons[2].getText().equals("X")) &&
 				(buttons[5].getText().equals("X")) &&
-				(buttons[8].getText().equals("X"))
-				) {
-			xWins(2,5,8);
+				(buttons[8].getText().equals("X"))) {
+			xWins(2, 5, 8);
 		}
-		if(
-				(buttons[0].getText().equals("X")) &&
+		if ((buttons[0].getText().equals("X")) &&
 				(buttons[4].getText().equals("X")) &&
-				(buttons[8].getText().equals("X"))
-				) {
-			xWins(0,4,8);
+				(buttons[8].getText().equals("X"))) {
+			xWins(0, 4, 8);
 		}
-		if(
-				(buttons[2].getText().equals("X")) &&
+		if ((buttons[2].getText().equals("X")) &&
 				(buttons[4].getText().equals("X")) &&
-				(buttons[6].getText().equals("X"))
-				) {
-			xWins(2,4,6);
+				(buttons[6].getText().equals("X"))) {
+			xWins(2, 4, 6);
 		}
-		//check O win conditions
-		if(
-				(buttons[0].getText().equals("O")) &&
+		// check O win conditions
+		if ((buttons[0].getText().equals("O")) &&
 				(buttons[1].getText().equals("O")) &&
-				(buttons[2].getText().equals("O"))
-				) {
-			oWins(0,1,2);
+				(buttons[2].getText().equals("O"))) {
+			oWins(0, 1, 2);
 		}
-		if(
-				(buttons[3].getText().equals("O")) &&
+		if ((buttons[3].getText().equals("O")) &&
 				(buttons[4].getText().equals("O")) &&
-				(buttons[5].getText().equals("O"))
-				) {
-			oWins(3,4,5);
+				(buttons[5].getText().equals("O"))) {
+			oWins(3, 4, 5);
 		}
-		if(
-				(buttons[6].getText().equals("O")) &&
+		if ((buttons[6].getText().equals("O")) &&
 				(buttons[7].getText().equals("O")) &&
-				(buttons[8].getText().equals("O"))
-				) {
-			oWins(6,7,8);
+				(buttons[8].getText().equals("O"))) {
+			oWins(6, 7, 8);
 		}
-		if(
-				(buttons[0].getText().equals("O")) &&
+		if ((buttons[0].getText().equals("O")) &&
 				(buttons[3].getText().equals("O")) &&
-				(buttons[6].getText().equals("O"))
-				) {
-			oWins(0,3,6);
+				(buttons[6].getText().equals("O"))) {
+			oWins(0, 3, 6);
 		}
-		if(
-				(buttons[1].getText().equals("O")) &&
+		if ((buttons[1].getText().equals("O")) &&
 				(buttons[4].getText().equals("O")) &&
-				(buttons[7].getText().equals("O"))
-				) {
-			oWins(1,4,7);
+				(buttons[7].getText().equals("O"))) {
+			oWins(1, 4, 7);
 		}
-		if(
-				(buttons[2].getText().equals("O")) &&
+		if ((buttons[2].getText().equals("O")) &&
 				(buttons[5].getText().equals("O")) &&
-				(buttons[8].getText().equals("O"))
-				) {
-			oWins(2,5,8);
+				(buttons[8].getText().equals("O"))) {
+			oWins(2, 5, 8);
 		}
-		if(
-				(buttons[0].getText().equals("O")) &&
+		if ((buttons[0].getText().equals("O")) &&
 				(buttons[4].getText().equals("O")) &&
-				(buttons[8].getText().equals("O"))
-				) {
-			oWins(0,4,8);
+				(buttons[8].getText().equals("O"))) {
+			oWins(0, 4, 8);
 		}
-		if(
-				(buttons[2].getText().equals("O")) &&
+		if ((buttons[2].getText().equals("O")) &&
 				(buttons[4].getText().equals("O")) &&
-				(buttons[6].getText().equals("O"))
-				) {
-			oWins(2,4,6);
+				(buttons[6].getText().equals("O"))) {
+			oWins(2, 4, 6);
 		}
 		// Nếu tất cả ô đã được đi và chưa ai thắng thì hòa
 		boolean allFilled = true;
@@ -469,7 +435,6 @@ public class TicTacToe implements ActionListener{
 		}
 
 	}
-	
 
 	public void xWins(int a, int b, int c) {
 		buttons[a].setBackground(Color.GREEN);
@@ -478,7 +443,7 @@ public class TicTacToe implements ActionListener{
 		textfield.setText("X wins");
 		gameOver = true;
 	}
-	
+
 	public void oWins(int a, int b, int c) {
 		buttons[a].setBackground(Color.GREEN);
 		buttons[b].setBackground(Color.GREEN);
@@ -486,19 +451,17 @@ public class TicTacToe implements ActionListener{
 		textfield.setText("O wins");
 		gameOver = true;
 	}
-	
+
 	private GameState getGameState() {
 		CellState[] state = new CellState[9];
 		for (int i = 0; i < 9; i++) {
 			state[i] = new CellState(
-				buttons[i].getText(),
-				buttons[i].getForeground(),
-				buttons[i].getBackground()
-			);
+					buttons[i].getText(),
+					buttons[i].getForeground(),
+					buttons[i].getBackground());
 		}
 		return new GameState(state, moveOrder, player1_turn);
 	}
-	
 
 	private void setGameState(GameState state) {
 		for (int i = 0; i < 9; i++) {
@@ -510,18 +473,17 @@ public class TicTacToe implements ActionListener{
 		player1_turn = state.player1Turn;
 
 		if (!gameOver)
-		textfield.setText(player1_turn ? "X turn" : "O turn");
+			textfield.setText(player1_turn ? "X turn" : "O turn");
 	}
-	
 
 	private void generateRandomPowerUp() {
 		int index = random.nextInt(9);
 		PowerUpType type = random.nextBoolean() ? PowerUpType.EXTRA_TURN : PowerUpType.REMOVE_OPPONENT_MARK;
 		currentPowerUp = new PowerUp(type, new java.awt.Point(index % 3, index / 3));
-	
+
 		buttons[index].setToolTipText("Power-up: " + type.name());
-	}				
-		
+	}
+
 	private void resetGame() {
 		for (int i = 0; i < 9; i++) {
 			buttons[i].setText("");
@@ -530,7 +492,7 @@ public class TicTacToe implements ActionListener{
 			buttons[i].setBackground(new Color(214, 232, 255));
 			buttons[i].setToolTipText(null);
 		}
-	
+
 		moveOrder.clear();
 		undoStack.clear();
 		redoStack.clear();
@@ -541,12 +503,12 @@ public class TicTacToe implements ActionListener{
 		powerUpButton.setEnabled(false);
 		powerUpButton.setText("Use Power-Up");
 		gameOver = false;
-	
+
 		generateRandomPowerUp();
-	
+
 		// Đặt player1_turn trước khi gọi firstTurn để tránh mâu thuẫn
 		player1_turn = true;
 		firstTurn();
-	}	
-	
+	}
+
 }
